@@ -1,0 +1,43 @@
+---
+title: "Postwork Sesión 6 BEDU Santander Programación en R"
+author: 'José David Vázquez Rojas '
+output:
+  pdf_document:
+    latex_engine: xelatex
+---
+Importa el conjunto de datos match.data.csv a R y realiza lo siguiente:
+```{r}
+library(dplyr)
+df <- read.csv("match.data.csv")
+head(df)
+```
+Agrega una nueva columna sumagoles que contenga la suma de goles por partido.
+```{r}
+n = dim(df)[1]
+sumagoles <- rep(0, n)
+for (i in 1:n) {
+  sumagoles[i] <-  df$home.score[i] + df$away.score[i]
+}
+df <- cbind(df, sumagoles)
+head(df)
+
+```
+
+Obtén el promedio por mes de la suma de goles.
+```{r}
+df <- mutate(df, Ym = format(as.Date(date), "%Y-%m"))
+goles <- df %>% group_by(Ym) %>% summarise(df = mean(sumagoles))
+
+```
+
+Crea la serie de tiempo del promedio por mes de la suma de goles hasta diciembre de 2019.
+```{r include=FALSE}
+mutate(df, date = as.Date(date, "%Y-%m-%d"))
+tsGoles <- ts(goles$df, start = c(2010,8), end = c(2019, 12), frequency = 12)
+```
+
+Grafica la serie de tiempo.
+```{r}
+ts.plot(tsGoles)
+```
+
